@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useGameStore } from '@/store/useGameStore'
 
@@ -15,6 +16,10 @@ interface FormData {
 export default function WriteForm() {
   const gameState = useGameStore((state) => state.gameState)
   const setGameState = useGameStore((state) => state.setGameState)
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const isPopupPreview = searchParams.get('popup') === 'success'
 
   const [mounted, setMounted] = useState(false)
   const [form, setForm] = useState<FormData>({
@@ -26,17 +31,29 @@ export default function WriteForm() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [isPreviewDismissed, setIsPreviewDismissed] = useState(false)
   const [error, setError] = useState('')
 
+  const showSuccessPopup = isSuccess || (isPopupPreview && !isPreviewDismissed)
+
   useEffect(() => {
-    setMounted(gameState === 'OPENED')
-  }, [gameState])
+    setMounted(gameState === 'OPENED' || isPopupPreview)
+  }, [gameState, isPopupPreview])
+
+  useEffect(() => {
+    setIsPreviewDismissed(false)
+  }, [isPopupPreview])
 
   const handleBack = () => {
     setMounted(false)
     setTimeout(() => {
       setIsSuccess(false)
+      setIsPreviewDismissed(false)
       setError('')
+      if (isPopupPreview) {
+        router.replace(pathname)
+        return
+      }
       setGameState('INTRO')
     }, 400)
   }
@@ -82,7 +99,7 @@ export default function WriteForm() {
     }
   }
 
-  if (gameState !== 'OPENED') return null
+  if (gameState !== 'OPENED' && !isPopupPreview) return null
 
   return (
     <div
@@ -91,36 +108,58 @@ export default function WriteForm() {
       }`}
       style={{ backgroundColor: '#fcfcfc' }}
     >
-      {isSuccess ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[6px]">
-          <div className="relative w-[300px] overflow-hidden rounded-[12px] shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
-            <img
-              src="/textures/inner.png"
+      {showSuccessPopup ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[6px]">
+          <div className="relative aspect-[1818/1254] w-[min(86vw,440px)] overflow-hidden rounded-[16px] shadow-[0_24px_60px_rgba(0,0,0,0.35)] md:w-[min(68vw,480px)]">
+            <Image
+              src="/textures/popup.png"
               alt=""
               aria-hidden
-              className="absolute inset-0 h-full w-full object-cover"
+              fill
+              sizes="(max-width: 768px) 86vw, 480px"
+              className="object-cover"
             />
-            <div className="relative flex flex-col items-center justify-center gap-5 px-8 py-12 text-center">
-              <div className="flex flex-col items-center gap-1">
-                <p className="font-sans text-[0.58rem] tracking-[0.2em] text-[#9a7a50] uppercase">발표일</p>
-                <p className="font-serif text-[0.95rem] tracking-[0.15em] text-[#1f150b]">2026년 4월 30일</p>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.28),transparent_34%)]" />
+            <div className="absolute left-1/2 top-[14.5%] h-[31%] w-[60%] max-w-[240px] -translate-x-1/2 text-center">
+              <div className="flex h-full flex-col items-center justify-center gap-2">
+                <div className="flex flex-col items-center gap-0.5">
+                  <p className="font-sans text-[0.48rem] tracking-[0.16em] text-[#9a7a50] uppercase">
+                    Announcement
+                  </p>
+                  <p className="font-serif text-[0.78rem] tracking-[0.12em] text-[#1f150b]">
+                    2026.04.30
+                  </p>
+                </div>
+                <div className="h-px w-11 bg-[#9a8060]/40" />
+                <h3 className="font-serif text-[1.18rem] tracking-[0.14em] text-[#1f150b]">
+                  응모 완료
+                </h3>
+                <p className="max-w-[205px] font-sans text-[0.62rem] leading-[1.45] text-[#5f4428]">
+                  응모가 정상적으로 접수되었습니다.
+                  <br />
+                  당첨자는 개별 안내드립니다.
+                </p>
+                <button
+                  type="button"
+                  onClick={isPopupPreview ? () => setIsPreviewDismissed(true) : handleBack}
+                  style={buttonStyle}
+                  className="min-w-[98px] px-0 transition-colors duration-200 hover:bg-[#1a1008]/5"
+                >
+                  확인
+                </button>
               </div>
-              <div className="h-px w-12 bg-[#9a8060]/40" />
-              <h3 className="font-serif text-[1.6rem] tracking-[0.2em] text-[#1f150b]">
-                응모 완료
-              </h3>
-              <button
-                type="button"
-                onClick={handleBack}
-                className="mt-2 rounded-[999px] border border-[rgba(80,50,20,0.22)] bg-[rgba(255,255,255,0.55)] px-6 py-2.5 font-sans text-[0.68rem] tracking-[0.22em] text-[#5b4128] uppercase backdrop-blur-sm transition hover:bg-[rgba(255,255,255,0.8)]"
-              >
-                확인
-              </button>
             </div>
           </div>
         </div>
       ) : null}
+
       <div className="flex min-h-full w-full items-start justify-center px-3 py-12 md:min-h-screen md:items-center md:px-0 md:py-0">
+        {isPopupPreview ? (
+          <div className="absolute top-5 right-6 z-40 rounded-full border border-[rgba(111,83,52,0.18)] bg-[rgba(255,255,255,0.82)] px-4 py-2 font-sans text-[0.62rem] tracking-[0.16em] text-[#6a4d31] shadow-[0_10px_30px_rgba(0,0,0,0.08)] backdrop-blur-sm uppercase">
+            Popup Preview
+          </div>
+        ) : null}
+
         <button
           onClick={handleBack}
           className="absolute top-5 left-6 z-40 border-none bg-transparent font-sans text-xs tracking-widest text-[#3c280a]/50 transition-colors hover:text-[#3c280a]/90"
@@ -128,14 +167,16 @@ export default function WriteForm() {
           돌아가기
         </button>
 
-        <div
-          className="relative flex w-full max-w-[1040px] flex-col items-center gap-3 rounded-[10px] p-3 shadow-[0_24px_70px_rgba(0,0,0,0.22)] md:w-auto md:max-w-none md:flex-row md:items-stretch md:justify-center md:gap-0 md:rounded-[8px] md:p-3"
-          style={{
-            backgroundColor: '#cdbfae',
-            backgroundImage:
-              'linear-gradient(115deg, #b29f86 0%, #e7ddcf 18%, #c8b79f 36%, #f3ece1 50%, #c4b095 66%, #e1d6c7 84%, #9a866f 100%)',
-          }}
-        >
+        <div className="relative flex w-full max-w-[1040px] flex-col items-center gap-3 rounded-[10px] bg-white p-3 shadow-[0_24px_70px_rgba(0,0,0,0.22)] md:w-auto md:max-w-none md:flex-row md:items-stretch md:justify-center md:gap-0 md:rounded-[8px] md:bg-transparent md:p-3">
+          <div
+            className="absolute inset-0 hidden rounded-[8px] md:block"
+            style={{
+              backgroundColor: '#cdbfae',
+              backgroundImage:
+                'linear-gradient(115deg, #b29f86 0%, #e7ddcf 18%, #c8b79f 36%, #f3ece1 50%, #c4b095 66%, #e1d6c7 84%, #9a866f 100%)',
+            }}
+          />
+
           <div className="relative mx-auto flex aspect-[5/7] w-[94%] max-w-[480px] flex-shrink-0 flex-col overflow-hidden shadow-xl md:mx-0 md:w-[min(52vh,520px)] md:shadow-none">
             <img
               src="/textures/inner.png"
@@ -177,13 +218,13 @@ export default function WriteForm() {
                   <p className="font-sans text-[min(0.75rem,3.5vw,1.6vh)] leading-[1.9] text-[#3a2c18] mix-blend-multiply md:leading-[2.2]">
                     아이의 첫 무대를 기억하시나요?
                     <br />
-                    두근거리던 그 설렘을 다시 한번—
+                    반짝이는 그 설렘을 다시 한번
                     <br />
-                    댄스 크루 <em className="not-italic font-semibold">범접</em>과 함께,
+                    댄스 아티스트 <em className="not-italic font-semibold">범접</em>과 함께,
                     <br />
                     아이가 직접 무대 위에 서는
                     <br />
-                    특별한 하루에 초대합니다.
+                    특별한 하루로 초대합니다.
                   </p>
 
                   <div className="flex w-full flex-col gap-[0.7vh] px-2 text-center font-sans text-[min(0.68rem,3.2vw,1.4vh)] leading-[1.4] text-[#3a2c18] mix-blend-multiply md:gap-[0.8vh] md:leading-[1.6]">
@@ -201,6 +242,9 @@ export default function WriteForm() {
                     </p>
                     <p>
                       <strong>모집 기간:</strong> 4월 - 5월 23일 마감
+                    </p>
+                    <p className="mt-[1.2vh] text-[min(0.6rem,2.8vw,1.2vh)] italic opacity-80">
+                      노스페이스 제품 20만원 이상 구매 고객 한정
                     </p>
                   </div>
                 </div>
@@ -233,7 +277,6 @@ export default function WriteForm() {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="flex h-[66%] w-[55%] -translate-y-[6%] flex-col justify-between md:h-[70%] md:w-[58%] md:-translate-y-[10%]">
                 <div className="flex items-center justify-center">
-                  {/* TNF 로고 높이와 맞추는 spacer */}
                   <div style={{ height: 22 }} />
                 </div>
 
@@ -337,7 +380,6 @@ export default function WriteForm() {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
