@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko" className={`${cinzel.variable} ${gowunDodum.variable} ${nanumPen.variable} h-full`}>
-      <body className="h-full overflow-hidden">{children}</body>
+      <body className="h-full overflow-hidden" suppressHydrationWarning>{children}</body>
     </html>
   )
 }

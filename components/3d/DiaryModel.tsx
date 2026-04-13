@@ -38,12 +38,13 @@ export default function DiaryModel() {
   const introCameraZ = isMobileViewport ? 7.2 : 6
   const introFov = isMobileViewport ? 48 : 42
 
-  // Load full PBR texture set (clean filenames)
-  const [colorTex, normalTex, roughnessTex, aoTex] = useLoader(TextureLoader, [
-    '/textures/cover_color.png',
-    '/textures/cover_normal.png',
-    '/textures/cover_roughness.png',
-    '/textures/cover_ao.png',
+  // Load full PBR texture set
+  const [colorTex, normalTex, specularTex, aoTex, dispTex] = useLoader(TextureLoader, [
+    '/textures/diary.png',
+    '/textures/diary_normal.png',
+    '/textures/diary_specular.png',
+    '/textures/diary_ambient.png',
+    '/textures/diary_displacement.png',
   ])
 
   // Create cover materials with full PBR front face
@@ -54,35 +55,39 @@ export default function DiaryModel() {
     colorTex.generateMipmaps = true
     colorTex.minFilter       = THREE.LinearMipmapLinearFilter
 
-    // Normal map — linear (tangent-space blue/purple)
+    // Normal map — linear (tangent-space)
     normalTex.anisotropy      = 16
     normalTex.generateMipmaps = true
     normalTex.minFilter       = THREE.LinearMipmapLinearFilter
 
-    // Roughness / AO — linear
-    roughnessTex.anisotropy   = 16
-    aoTex.anisotropy          = 16
+    // Specular / AO / Displacement — linear
+    specularTex.anisotropy   = 16
+    aoTex.anisotropy         = 16
+    dispTex.anisotropy       = 16
 
-    // Front face — full PBR chrome embossed
+    // Front face — full PBR
     const frontMat = new MeshStandardMaterial({
       map:             colorTex,
       normalMap:       normalTex,
       normalScale:     new THREE.Vector2(0.15, 0.15),
-      metalness:       0.92,
-      roughness:       0.12,
-      envMapIntensity: 1.0,
+      roughnessMap:    specularTex,
+      roughness:       0.6,
+      metalness:       0.1,
+      aoMap:           aoTex,
+      aoMapIntensity:  1.0,
+      envMapIntensity: 0.8,
     })
 
     // Back face of front cover (inside, faces pages when open)
     const backFaceMat = new MeshStandardMaterial({
       color:    '#b8bdc5',
-      metalness: 0.88,
-      roughness: 0.22,
+      metalness: 0.1,
+      roughness: 0.7,
     })
 
     // BoxGeometry face order: +x, -x, +y, -y, +z (front), -z (back)
     return [chromeMid, chromeDark, chromeSilver, chromeSilver, frontMat, backFaceMat]
-  }, [colorTex, normalTex])
+  }, [colorTex, normalTex, specularTex, aoTex, dispTex])
 
   useEffect(() => { setLoaded() }, [setLoaded])
 

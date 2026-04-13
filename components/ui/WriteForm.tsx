@@ -82,10 +82,6 @@ export default function WriteForm() {
     }
   }
 
-  const closeSuccessPopup = () => {
-    setIsSuccess(false)
-  }
-
   if (gameState !== 'OPENED') return null
 
   return (
@@ -95,6 +91,35 @@ export default function WriteForm() {
       }`}
       style={{ backgroundColor: '#fcfcfc' }}
     >
+      {isSuccess ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[6px]">
+          <div className="relative w-[300px] overflow-hidden rounded-[12px] shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+            <img
+              src="/textures/inner.png"
+              alt=""
+              aria-hidden
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="relative flex flex-col items-center justify-center gap-5 px-8 py-12 text-center">
+              <div className="flex flex-col items-center gap-1">
+                <p className="font-sans text-[0.58rem] tracking-[0.2em] text-[#9a7a50] uppercase">발표일</p>
+                <p className="font-serif text-[0.95rem] tracking-[0.15em] text-[#1f150b]">2026년 4월 30일</p>
+              </div>
+              <div className="h-px w-12 bg-[#9a8060]/40" />
+              <h3 className="font-serif text-[1.6rem] tracking-[0.2em] text-[#1f150b]">
+                응모 완료
+              </h3>
+              <button
+                type="button"
+                onClick={handleBack}
+                className="mt-2 rounded-[999px] border border-[rgba(80,50,20,0.22)] bg-[rgba(255,255,255,0.55)] px-6 py-2.5 font-sans text-[0.68rem] tracking-[0.22em] text-[#5b4128] uppercase backdrop-blur-sm transition hover:bg-[rgba(255,255,255,0.8)]"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div className="flex min-h-full w-full items-start justify-center px-3 py-12 md:min-h-screen md:items-center md:px-0 md:py-0">
         <button
           onClick={handleBack}
@@ -121,35 +146,44 @@ export default function WriteForm() {
 
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="flex h-[66%] w-[66%] -translate-y-[6%] flex-col justify-between md:h-[70%] md:w-[70%] md:-translate-y-[10%]">
-                <div className="flex select-none items-center justify-center gap-3">
+                <div className="flex select-none items-center justify-center">
                   <Image
                     src="/textures/tnf.png"
                     alt="The North Face"
-                    width={64}
-                    height={20}
+                    width={72}
+                    height={22}
                     className="object-contain opacity-70 mix-blend-multiply"
-                  />
-                  <span className="font-serif text-[0.8rem] text-[#9a8060]">×</span>
-                  <Image
-                    src="/textures/beomjeop.png"
-                    alt="BUMSUP"
-                    width={64}
-                    height={20}
-                    className="object-contain grayscale opacity-65 mix-blend-multiply"
                   />
                 </div>
 
-                <div className="flex flex-col items-center gap-[2.4vh] text-center md:gap-[2.5vh]">
-                  <h1 className="font-serif text-[min(1.8rem,8vw,4vh)] leading-[1.1] tracking-[0.4vh] text-[#1a1008] opacity-90 uppercase">
-                    Dance
-                    <br />
-                    Class
-                  </h1>
+                <div className="flex flex-col items-center gap-[2vh] text-center md:gap-[2.2vh]">
+                  <div className="flex select-none flex-col items-center gap-[1.2vh]">
+                    <h1 className="font-serif text-[min(1.1rem,5vw,2.4vh)] leading-[1.1] tracking-[0.5vh] text-[#1a1008] opacity-90 uppercase">
+                      Dance Class
+                    </h1>
+                    <div className="flex items-center gap-[1vh]">
+                      <span className="h-px w-6 bg-[#9a8060]/40" />
+                      <Image
+                        src="/textures/beomjeop.png"
+                        alt="BUMSUP"
+                        width={80}
+                        height={24}
+                        className="object-contain opacity-90"
+                      />
+                      <span className="h-px w-6 bg-[#9a8060]/40" />
+                    </div>
+                  </div>
 
-                  <p className="font-sans text-[min(0.75rem,3.5vw,1.6vh)] leading-[1.8] text-[#3a2c18] mix-blend-multiply md:leading-[2.2]">
-                    가족의 달을 맞아 부모님과 아이가 함께 빛나는
+                  <p className="font-sans text-[min(0.75rem,3.5vw,1.6vh)] leading-[1.9] text-[#3a2c18] mix-blend-multiply md:leading-[2.2]">
+                    아이의 첫 무대를 기억하시나요?
                     <br />
-                    <em className="not-italic font-semibold">스페셜 클래스</em>에 여러분을 초대합니다.
+                    두근거리던 그 설렘을 다시 한번—
+                    <br />
+                    댄스 크루 <em className="not-italic font-semibold">범접</em>과 함께,
+                    <br />
+                    아이가 직접 무대 위에 서는
+                    <br />
+                    특별한 하루에 초대합니다.
                   </p>
 
                   <div className="flex w-full flex-col gap-[0.7vh] px-2 text-center font-sans text-[min(0.68rem,3.2vw,1.4vh)] leading-[1.4] text-[#3a2c18] mix-blend-multiply md:gap-[0.8vh] md:leading-[1.6]">
@@ -167,9 +201,6 @@ export default function WriteForm() {
                     </p>
                     <p>
                       <strong>모집 기간:</strong> 4월 - 5월 23일 마감
-                    </p>
-                    <p className="mt-[1.2vh] text-[min(0.6rem,2.8vw,1.2vh)] italic opacity-80">
-                      노스페이스 제품 20만원 이상 구매 고객 한정
                     </p>
                   </div>
                 </div>
@@ -200,21 +231,23 @@ export default function WriteForm() {
             />
 
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex h-[66%] w-[66%] -translate-y-[6%] flex-col justify-between md:h-[70%] md:w-[70%] md:-translate-y-[10%]">
+              <div className="flex h-[66%] w-[55%] -translate-y-[6%] flex-col justify-between md:h-[70%] md:w-[58%] md:-translate-y-[10%]">
                 <div className="flex items-center justify-center">
-                  <h2 className="font-serif text-[min(1.45rem,4.8vw,2.8vh)] leading-none tracking-[0.7vh] text-[#1a1008] opacity-90 uppercase md:text-[min(1.8rem,5.5vw,3.4vh)] md:tracking-[1vh]">
-                    RSVP
-                  </h2>
+                  {/* TNF 로고 높이와 맞추는 spacer */}
+                  <div style={{ height: 22 }} />
                 </div>
 
                 <div className="flex flex-1 flex-col justify-center py-[1.2vh] md:py-[2vh]">
+                  <h2 className="mb-[1.2vh] text-center font-serif text-[min(1.1rem,5vw,2.4vh)] leading-[1.1] tracking-[0.5vh] text-[#1a1008] opacity-90 uppercase">
+                    RSVP
+                  </h2>
                   <form
                     id="rsvp-form"
                     onSubmit={handleSubmit}
                     onClick={(event) => event.stopPropagation()}
-                    className="flex w-full flex-col gap-[0.45vh] md:gap-[1.2vh]"
+                    className="flex w-full flex-col gap-[0.3vh] md:gap-[0.8vh]"
                   >
-                    <div className="flex flex-col gap-[0.45vh] md:flex-row md:gap-[1.5vh]">
+                    <div className="flex flex-col gap-[0.3vh] md:gap-[0.8vh]">
                       <Field label="아이 이름 *">
                         <input
                           name="name"
@@ -222,7 +255,7 @@ export default function WriteForm() {
                           onChange={handleChange}
                           required
                           placeholder="예: 김하늘"
-                          style={{ ...inputStyle, fontSize: 'min(0.92rem, 3.8vw, 1.95vh)' }}
+                          style={{ ...inputStyle, fontSize: 'min(0.72rem, 2.8vw, 1.5vh)' }}
                         />
                       </Field>
                       <Field label="보호자 연락처 *">
@@ -233,12 +266,12 @@ export default function WriteForm() {
                           onChange={handleChange}
                           required
                           placeholder="010-0000-0000"
-                          style={{ ...inputStyle, fontSize: 'min(0.92rem, 3.8vw, 1.95vh)' }}
+                          style={{ ...inputStyle, fontSize: 'min(0.72rem, 2.8vw, 1.5vh)' }}
                         />
                       </Field>
                     </div>
 
-                    <div className="flex flex-col gap-[0.45vh] md:flex-row md:gap-[1.5vh]">
+                    <div className="flex flex-col gap-[0.3vh] md:gap-[0.8vh]">
                       <Field label="보호자와의 관계 *">
                         <input
                           name="relationship"
@@ -246,7 +279,7 @@ export default function WriteForm() {
                           onChange={handleChange}
                           required
                           placeholder="예: 엄마, 아빠"
-                          style={{ ...inputStyle, fontSize: 'min(0.92rem, 3.8vw, 1.95vh)' }}
+                          style={{ ...inputStyle, fontSize: 'min(0.72rem, 2.8vw, 1.5vh)' }}
                         />
                       </Field>
                       <Field label="총 인원 *">
@@ -254,7 +287,7 @@ export default function WriteForm() {
                           name="guests"
                           value={form.guests}
                           onChange={handleChange}
-                          style={{ ...inputStyle, fontSize: 'min(1rem, 3.9vw, 2vh)' }}
+                          style={{ ...inputStyle, fontSize: 'min(0.72rem, 2.8vw, 1.5vh)' }}
                         >
                           {[1, 2, 3, 4, 5].map((count) => (
                             <option key={count} value={count}>
@@ -275,7 +308,7 @@ export default function WriteForm() {
                         placeholder="행사에 기대하는 점을 적어 주세요."
                         style={{
                           ...inputStyle,
-                          fontSize: 'min(0.96rem, 3.8vw, 1.95vh)',
+                          fontSize: 'min(0.72rem, 2.8vw, 1.5vh)',
                           resize: 'none',
                           lineHeight: 1.35,
                           paddingTop: '0.45vh',
@@ -305,41 +338,6 @@ export default function WriteForm() {
               </div>
             </div>
 
-            {isSuccess ? (
-              <div className="absolute inset-0 z-20 flex items-center justify-center bg-[rgba(249,245,238,0.72)] p-5 backdrop-blur-[3px]">
-                <div className="relative w-full max-w-[290px] overflow-hidden rounded-[18px] border border-[rgba(151,126,93,0.26)] bg-[linear-gradient(180deg,rgba(255,252,247,0.98),rgba(244,235,220,0.96))] px-6 py-7 text-center shadow-[0_22px_55px_rgba(77,52,25,0.18)]">
-                  <div className="absolute inset-x-5 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(171,139,93,0.72),transparent)]" />
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(171,139,93,0.3)] bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.98),rgba(231,213,182,0.95))] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
-                    <span className="font-serif text-[1.2rem] text-[#8b6740]">✓</span>
-                  </div>
-                  <p className="font-serif text-[0.62rem] tracking-[0.35em] text-[#9a7a50] uppercase">
-                    Entry Complete
-                  </p>
-                  <h3 className="mt-3 font-serif text-[1.5rem] tracking-[0.18em] text-[#1f150b]">
-                    응모 완료
-                  </h3>
-                  <p className="mt-3 font-sans text-[0.78rem] leading-6 text-[#6f5334]">
-                    소중한 응모가 정상적으로 접수되었습니다.
-                    <br />
-                    선정 결과는 개별 안내드릴 예정입니다.
-                  </p>
-                  <div className="mt-5 flex items-center justify-center gap-2 opacity-70">
-                    <span className="h-px w-10 bg-[rgba(154,122,80,0.35)]" />
-                    <span className="font-serif text-[0.58rem] tracking-[0.35em] text-[#9a7a50] uppercase">
-                      The North Face
-                    </span>
-                    <span className="h-px w-10 bg-[rgba(154,122,80,0.35)]" />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={closeSuccessPopup}
-                    className="mt-6 w-full rounded-[999px] border border-[rgba(111,83,52,0.16)] bg-[rgba(255,255,255,0.72)] px-4 py-3 font-sans text-[0.72rem] tracking-[0.24em] text-[#5b4128] uppercase transition hover:bg-[rgba(255,255,255,0.92)]"
-                  >
-                    확인
-                  </button>
-                </div>
-              </div>
-            ) : null}
           </div>
         </div>
       </div>
@@ -350,7 +348,7 @@ export default function WriteForm() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-[0.3vh] md:gap-[0.8vh]">
-      <label className="font-sans text-[min(0.58rem,2.5vw,1.05vh)] tracking-[0.08vh] text-[#9a7a50] italic uppercase md:text-[min(0.7rem,3vw,1.4vh)] md:tracking-[0.1vh]">
+      <label className="font-sans text-[min(0.52rem,2vw,0.9vh)] tracking-[0.06vh] text-[#9a7a50] italic uppercase md:text-[min(0.58rem,2.2vw,1.1vh)] md:tracking-[0.08vh]">
         {label}
       </label>
       {children}
@@ -364,10 +362,10 @@ const inputStyle: React.CSSProperties = {
   borderBottom: '1px dashed rgba(80,50,20,0.28)',
   outline: 'none',
   fontFamily: 'var(--font-handwriting), cursive',
-  fontSize: '1.25rem',
+  fontSize: '0.85rem',
   color: '#1a1008',
   width: '100%',
-  padding: '2px 0 4px',
+  padding: '1px 0 3px',
 }
 
 const buttonStyle: React.CSSProperties = {
