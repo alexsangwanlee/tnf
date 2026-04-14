@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Cinzel, Gowun_Dodum, Nanum_Pen_Script } from 'next/font/google'
+import { PRELOAD_IMAGE_ASSETS } from '@/lib/assetPreload'
 import './globals.css'
 
 const cinzel = Cinzel({
@@ -28,6 +29,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko" className={`${cinzel.variable} ${gowunDodum.variable} ${nanumPen.variable} h-full`}>
+      <head>
+        {PRELOAD_IMAGE_ASSETS.map((href) => (
+          <link key={href} rel="preload" as="image" href={href} />
+        ))}
+      </head>
       <body className="h-full overflow-hidden" suppressHydrationWarning>{children}</body>
     </html>
   )

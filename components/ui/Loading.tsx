@@ -1,20 +1,14 @@
 'use client'
 
 import { useEffect } from 'react'
+import { PRELOAD_IMAGE_ASSETS } from '@/lib/assetPreload'
 import { useGameStore } from '@/store/useGameStore'
-
-const PRELOAD_IMAGES = [
-  '/textures/inner.png',
-  '/textures/tnf.png',
-  '/textures/beomjeop.png',
-]
 
 export default function Loading() {
   const isLoaded = useGameStore((s) => s.isLoaded)
 
   useEffect(() => {
-    // Prefetch critical UI images
-    PRELOAD_IMAGES.forEach((src) => {
+    PRELOAD_IMAGE_ASSETS.forEach((src) => {
       const img = new Image()
       img.src = src
     })

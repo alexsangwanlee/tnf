@@ -120,8 +120,8 @@ export default function WriteForm() {
               className="object-cover"
             />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.28),transparent_34%)]" />
-            <div className="absolute left-1/2 top-[14.5%] h-[31%] w-[60%] max-w-[240px] -translate-x-1/2 text-center">
-              <div className="flex h-full flex-col items-center justify-center gap-2">
+            <div className="absolute inset-0 flex items-center justify-center px-8 text-center">
+              <div className="flex w-[60%] max-w-[240px] flex-col items-center justify-center gap-2">
                 <div className="flex flex-col items-center gap-0.5">
                   <p className="font-sans text-[0.48rem] tracking-[0.16em] text-[#9a7a50] uppercase">
                     Announcement
