@@ -23,10 +23,13 @@ function getPurchaseLabel(value: EntryRow['purchase_type']) {
   return '-'
 }
 
-async function downloadReceipt(supabase: SupabaseClient, path: string): Promise<Uint8Array | null> {
+async function downloadReceiptBase64(supabase: SupabaseClient, path: string): Promise<string | null> {
   const { data, error } = await supabase.storage.from(RECEIPT_BUCKET).download(path)
   if (error || !data) return null
-  return new Uint8Array(await data.arrayBuffer())
+  const bytes = new Uint8Array(await data.arrayBuffer())
+  let binary = ''
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i])
+  return btoa(binary)
 }
 
 function getImageExtension(path: string): 'png' | 'jpeg' {
@@ -94,11 +97,11 @@ export async function GET(req: NextRequest) {
     row.alignment = { vertical: 'middle' }
 
     if (entry.receipt_file_path) {
-      const imageBuffer = await downloadReceipt(supabase, entry.receipt_file_path)
-      if (imageBuffer) {
+      const base64 = await downloadReceiptBase64(supabase, entry.receipt_file_path)
+      if (base64) {
         const ext = getImageExtension(entry.receipt_file_path)
         const imageId = workbook.addImage({
-          buffer: imageBuffer as unknown as Buffer,
+          base64,
           extension: ext,
         })
 
