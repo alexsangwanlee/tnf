@@ -102,7 +102,7 @@ export default async function AdminPage() {
               borderRadius: '2px',
             }}
           >
-            EXPORT CSV
+            EXPORT EXCEL
           </a>
         </div>
 

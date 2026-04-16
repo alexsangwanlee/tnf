@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import ExcelJS from 'exceljs'
 
 const RECEIPT_BUCKET = 'entry-receipts'
 
@@ -16,29 +17,21 @@ interface EntryRow {
   created_at: string
 }
 
-function escapeCsv(value: string | number | boolean | null | undefined) {
-  return `"${String(value ?? '').replace(/"/g, '""')}"`
-}
-
 function getPurchaseLabel(value: EntryRow['purchase_type']) {
   if (value === 'offline') return '오프라인'
   if (value === 'online') return '온라인'
   return '-'
 }
 
-async function getReceiptUrl(supabase: SupabaseClient, path?: string | null) {
-  if (!path) return ''
+async function downloadReceipt(supabase: SupabaseClient, path: string): Promise<Buffer | null> {
+  const { data, error } = await supabase.storage.from(RECEIPT_BUCKET).download(path)
+  if (error || !data) return null
+  return Buffer.from(await data.arrayBuffer())
+}
 
-  const { data, error } = await supabase.storage
-    .from(RECEIPT_BUCKET)
-    .createSignedUrl(path, 60 * 60 * 24 * 30)
-
-  if (error) {
-    console.error('Supabase signed URL error:', error)
-    return ''
-  }
-
-  return data.signedUrl
+function getImageExtension(path: string): 'png' | 'jpeg' {
+  if (path.endsWith('.png')) return 'png'
+  return 'jpeg'
 }
 
 export async function GET(req: NextRequest) {
@@ -64,32 +57,68 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 })
   }
 
-  const header =
-    '번호,구매 방식,개인 정보 동의,공식몰 회원 ID,연락처,성함,영수증 파일명,영수증 첨부 URL,신청일시\n'
-  const rows = await Promise.all(
-    (data as EntryRow[]).map(async (entry, index) => {
-      const receiptUrl = await getReceiptUrl(supabase, entry.receipt_file_path)
+  const entries = data as EntryRow[]
 
-      return [
-        index + 1,
-        escapeCsv(getPurchaseLabel(entry.purchase_type)),
-        escapeCsv(entry.privacy_agreed ? '동의' : '미동의'),
-        escapeCsv(entry.official_mall_id),
-        escapeCsv(entry.phone),
-        escapeCsv(entry.buyer_name || entry.name),
-        escapeCsv(entry.receipt_file_name),
-        escapeCsv(receiptUrl),
-        escapeCsv(new Date(entry.created_at).toLocaleString('ko-KR')),
-      ].join(',')
-    })
-  )
+  const workbook = new ExcelJS.Workbook()
+  const sheet = workbook.addWorksheet('응모 목록')
 
-  const csv = '\uFEFF' + header + rows.join('\n')
+  const headers = ['번호', '구매 방식', '개인 정보 동의', '공식몰 회원 ID', '연락처', '성함', '영수증', '신청일시']
+  const headerRow = sheet.addRow(headers)
+  headerRow.font = { bold: true, size: 11 }
+  headerRow.alignment = { vertical: 'middle', horizontal: 'center' }
 
-  return new NextResponse(csv, {
+  sheet.columns = [
+    { width: 6 },
+    { width: 12 },
+    { width: 14 },
+    { width: 20 },
+    { width: 16 },
+    { width: 12 },
+    { width: 18 },
+    { width: 20 },
+  ]
+
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i]
+    const row = sheet.addRow([
+      i + 1,
+      getPurchaseLabel(entry.purchase_type),
+      entry.privacy_agreed ? '동의' : '미동의',
+      entry.official_mall_id || '-',
+      entry.phone,
+      entry.buyer_name || entry.name,
+      '',
+      new Date(entry.created_at).toLocaleString('ko-KR'),
+    ])
+
+    row.alignment = { vertical: 'middle' }
+
+    if (entry.receipt_file_path) {
+      const imageBuffer = await downloadReceipt(supabase, entry.receipt_file_path)
+      if (imageBuffer) {
+        const ext = getImageExtension(entry.receipt_file_path)
+        const imageId = workbook.addImage({
+          buffer: imageBuffer,
+          extension: ext,
+        })
+
+        const rowIndex = i + 1
+        sheet.addImage(imageId, {
+          tl: { col: 6, row: rowIndex },
+          ext: { width: 120, height: 120 },
+        })
+
+        row.height = 95
+      }
+    }
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer()
+
+  return new NextResponse(buffer, {
     headers: {
-      'Content-Type': 'text/csv; charset=utf-8',
-      'Content-Disposition': `attachment; filename="event-entries-${Date.now()}.csv"`,
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename="event-entries-${Date.now()}.xlsx"`,
     },
   })
 }
