@@ -11,6 +11,10 @@ export const CRITICAL_UI_IMAGES = [
   '/textures/popup.png',
   '/textures/tnf.png',
   '/textures/BUMSUP.png',
+  '/textures/11.png',
+  '/textures/22.png',
+  '/textures/33.png',
+  '/textures/44.png',
 ]
 
 export const PRELOAD_IMAGE_ASSETS = [...DIARY_TEXTURES, ...CRITICAL_UI_IMAGES]
