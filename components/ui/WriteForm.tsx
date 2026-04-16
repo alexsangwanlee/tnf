@@ -5,13 +5,20 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useGameStore } from '@/store/useGameStore'
 
-interface FormData {
-  name: string
+type PurchaseType = 'online' | 'offline'
+
+interface FormValues {
+  purchaseType: PurchaseType
+  privacyAgreed: boolean
+  officialMallId: string
   phone: string
-  relationship: string
-  guests: string
-  expectation: string
+  buyerName: string
 }
+
+const purchaseOptions: { value: PurchaseType; label: string }[] = [
+  { value: 'online', label: '온라인' },
+  { value: 'offline', label: '오프라인' },
+]
 
 export default function WriteForm() {
   const gameState = useGameStore((state) => state.gameState)
@@ -22,19 +29,21 @@ export default function WriteForm() {
   const isPopupPreview = searchParams.get('popup') === 'success'
 
   const [mounted, setMounted] = useState(false)
-  const [form, setForm] = useState<FormData>({
-    name: '',
+  const [form, setForm] = useState<FormValues>({
+    purchaseType: 'online',
+    privacyAgreed: false,
+    officialMallId: '',
     phone: '',
-    relationship: '',
-    guests: '2',
-    expectation: '',
+    buyerName: '',
   })
+  const [receiptFile, setReceiptFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [isPreviewDismissed, setIsPreviewDismissed] = useState(false)
   const [error, setError] = useState('')
 
   const showSuccessPopup = isSuccess || (isPopupPreview && !isPreviewDismissed)
+  const isOffline = form.purchaseType === 'offline'
 
   useEffect(() => {
     setMounted(gameState === 'OPENED' || isPopupPreview)
@@ -58,19 +67,59 @@ export default function WriteForm() {
     }, 400)
   }
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }))
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked, name, type, value } = event.target
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }))
+    setError('')
+  }
+
+  const handlePurchaseTypeChange = (purchaseType: PurchaseType) => {
+    setForm((prev) => ({ ...prev, purchaseType }))
+    if (purchaseType === 'online') {
+      setReceiptFile(null)
+    }
+    setError('')
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setReceiptFile(event.target.files?.[0] ?? null)
     setError('')
   }
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
 
-    if (!form.name || !form.phone || !form.relationship) {
-      setError('아이 이름, 연락처, 보호자와의 관계를 입력해 주세요.')
+    if (!form.privacyAgreed) {
+      setError('개인 정보 수집 및 이용 동의가 필요합니다.')
       return
+    }
+
+    if (!form.phone.trim() || !form.buyerName.trim()) {
+      setError('연락처와 성함을 입력해 주세요.')
+      return
+    }
+
+    if (form.purchaseType === 'online' && !form.officialMallId.trim()) {
+      setError('온라인 구매 고객은 공식몰 회원 ID를 입력해 주세요.')
+      return
+    }
+
+    if (form.purchaseType === 'offline' && !receiptFile) {
+      setError('오프라인 구매 고객은 실물 영수증 이미지를 첨부해 주세요.')
+      return
+    }
+
+    const body = new FormData()
+    body.append('purchaseType', form.purchaseType)
+    body.append('privacyAgreed', String(form.privacyAgreed))
+    body.append('officialMallId', form.officialMallId.trim())
+    body.append('phone', form.phone.trim())
+    body.append('buyerName', form.buyerName.trim())
+    if (receiptFile) {
+      body.append('receiptFile', receiptFile)
     }
 
     setIsSubmitting(true)
@@ -78,8 +127,7 @@ export default function WriteForm() {
     try {
       const response = await fetch('/api/submit-entry', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body,
       })
 
       const data = (await response.json().catch(() => null)) as { error?: string } | null
@@ -91,9 +139,7 @@ export default function WriteForm() {
       setIsSuccess(true)
       setError('')
     } catch (submitError) {
-      setError(
-        submitError instanceof Error ? submitError.message : '제출 중 오류가 발생했습니다.'
-      )
+      setError(submitError instanceof Error ? submitError.message : '제출 중 오류가 발생했습니다.')
     } finally {
       setIsSubmitting(false)
     }
@@ -121,13 +167,20 @@ export default function WriteForm() {
             />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.28),transparent_34%)]" />
             <div className="absolute inset-0 flex items-center justify-center px-8 text-center">
-              <div className="flex w-[60%] max-w-[240px] flex-col items-center justify-center gap-2">
+              <div className="flex w-[60%] max-w-[240px] -translate-y-[12%] flex-col items-center justify-center gap-2">
+                <Image
+                  src="/textures/tnf.png"
+                  alt="The North Face"
+                  width={72}
+                  height={22}
+                  className="object-contain opacity-80"
+                />
                 <div className="flex flex-col items-center gap-0.5">
-                  <p className="font-sans text-[0.48rem] tracking-[0.16em] text-[#9a7a50] uppercase">
-                    Announcement
+                  <p className="font-sans text-[0.68rem] font-semibold tracking-[0.16em] text-[#1a1008]">
+                    당첨자 발표
                   </p>
                   <p className="font-serif text-[0.78rem] tracking-[0.12em] text-[#1f150b]">
-                    2026.04.30
+                    2025.05.04
                   </p>
                 </div>
                 <div className="h-px w-11 bg-[#9a8060]/40" />
@@ -238,13 +291,13 @@ export default function WriteForm() {
                       <strong>대상:</strong> 초등학생 8세 - 13세 (보호자 동반)
                     </p>
                     <p>
-                      <strong>모집 인원:</strong> 보호자 동반 최대 200명
+                      <strong>모집 인원:</strong> 50~100명 추첨 (어린이 기준)
                     </p>
                     <p>
-                      <strong>모집 기간:</strong> 4월 - 5월 23일 마감
+                      <strong>모집 기간:</strong> 4/20(월) ~ 4/26(일)
                     </p>
                     <p className="mt-[1.2vh] text-[min(0.6rem,2.8vw,1.2vh)] italic opacity-80">
-                      노스페이스 제품 20만원 이상 구매 고객 한정
+                      노스페이스 키즈 제품 20만원 이상 구매 고객 한정
                     </p>
                   </div>
                 </div>
@@ -275,92 +328,134 @@ export default function WriteForm() {
             />
 
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex h-[66%] w-[55%] -translate-y-[6%] flex-col justify-between md:h-[70%] md:w-[58%] md:-translate-y-[10%]">
-                <div className="flex items-center justify-center">
-                  <div style={{ height: 22 }} />
-                </div>
-
-                <div className="flex flex-1 flex-col justify-center py-[1.2vh] md:py-[2vh]">
-                  <h2 className="mb-[1.2vh] text-center font-serif text-[min(1.1rem,5vw,2.4vh)] leading-[1.1] tracking-[0.5vh] text-[#1a1008] opacity-90 uppercase">
-                    RSVP
+              <div className="flex h-[78%] w-[58%] -translate-y-[7%] flex-col justify-between md:h-[80%] md:w-[58%] md:-translate-y-[10%]">
+                <div className="flex flex-1 flex-col" style={{ paddingTop: '5vh' }}>
+                  <h2 className="text-center font-serif text-[min(1rem,4.8vw,2vh)] leading-[1.1] tracking-[0.42vh] text-[#1a1008] opacity-90 uppercase" style={{ marginBottom: '2.5vh' }}>
+                    ENTRY
                   </h2>
+
                   <form
                     id="rsvp-form"
                     onSubmit={handleSubmit}
                     onClick={(event) => event.stopPropagation()}
-                    className="flex w-full flex-col gap-[0.3vh] md:gap-[0.8vh]"
+                    className="flex w-full flex-col gap-[0.55vh] md:gap-[0.7vh]"
                   >
-                    <div className="flex flex-col gap-[0.3vh] md:gap-[0.8vh]">
-                      <Field label="아이 이름 *">
-                        <input
-                          name="name"
-                          value={form.name}
-                          onChange={handleChange}
-                          required
-                          placeholder="예: 김하늘"
-                          style={{ ...inputStyle, fontSize: 'min(0.72rem, 2.8vw, 1.5vh)' }}
-                        />
-                      </Field>
-                      <Field label="보호자 연락처 *">
-                        <input
-                          name="phone"
-                          type="tel"
-                          value={form.phone}
-                          onChange={handleChange}
-                          required
-                          placeholder="010-0000-0000"
-                          style={{ ...inputStyle, fontSize: 'min(0.72rem, 2.8vw, 1.5vh)' }}
-                        />
-                      </Field>
+                    <div className="border-y border-[rgba(154,128,96,0.24)] py-[0.8vh] text-center font-sans text-[min(0.72rem,2.6vw,1.3vh)] leading-[1.6] text-[#3a2510]">
+                      <strong className="font-semibold">
+                        노스페이스 키즈 제품
+                        <br />
+                        20만원 이상 구매 고객 한정 이벤트
+                      </strong>
+                      <br />
+                      구매 증빙 미충족 시 당첨 제외됩니다.
                     </div>
 
-                    <div className="flex flex-col gap-[0.3vh] md:gap-[0.8vh]">
-                      <Field label="보호자와의 관계 *">
+                    <Field label="1. 개인 정보 동의 *">
+                      <label className="flex min-w-0 items-start gap-2 font-sans text-[min(0.65rem,2.5vw,1.15vh)] leading-[1.25] text-[#2c1f0e]">
                         <input
-                          name="relationship"
-                          value={form.relationship}
+                          name="privacyAgreed"
+                          type="checkbox"
+                          checked={form.privacyAgreed}
                           onChange={handleChange}
                           required
-                          placeholder="예: 엄마, 아빠"
-                          style={{ ...inputStyle, fontSize: 'min(0.72rem, 2.8vw, 1.5vh)' }}
+                          style={checkboxStyle}
+                        />
+                        <span>개인정보 수집 및 이용에 동의합니다.</span>
+                      </label>
+                    </Field>
+
+                    <Field label="구매 방식 *">
+                      <div className="grid grid-cols-1 gap-1">
+                        {purchaseOptions.map((option) => {
+                          const selected = form.purchaseType === option.value
+                          return (
+                            <label
+                              key={option.value}
+                              className="flex cursor-pointer items-center justify-center border px-2 py-[0.28vh] font-sans text-[min(0.65rem,2.5vw,1.15vh)] font-medium transition-colors"
+                              style={{
+                                borderColor: selected ? 'rgba(40,25,5,0.48)' : 'rgba(80,50,20,0.2)',
+                                background: selected ? 'rgba(154,128,96,0.15)' : 'rgba(255,255,255,0.16)',
+                                color: selected ? '#1a1008' : '#6b543c',
+                              }}
+                            >
+                              <input
+                                type="radio"
+                                name="purchaseType"
+                                value={option.value}
+                                checked={selected}
+                                onChange={() => handlePurchaseTypeChange(option.value)}
+                                className="sr-only"
+                              />
+                              {option.label}
+                            </label>
+                          )
+                        })}
+                      </div>
+                    </Field>
+
+                    {form.purchaseType === 'online' ? (
+                      <Field label="2. (온라인 구매 고객) 공식몰 회원 ID *">
+                        <input
+                          name="officialMallId"
+                          value={form.officialMallId}
+                          onChange={handleChange}
+                          required
+                          placeholder="예: tnfkids123"
+                          style={inputStyle}
                         />
                       </Field>
-                      <Field label="총 인원 *">
-                        <select
-                          name="guests"
-                          value={form.guests}
-                          onChange={handleChange}
-                          style={{ ...inputStyle, fontSize: 'min(0.72rem, 2.8vw, 1.5vh)' }}
-                        >
-                          {[1, 2, 3, 4, 5].map((count) => (
-                            <option key={count} value={count}>
-                              {count}명
-                            </option>
-                          ))}
-                        </select>
-                      </Field>
-                    </div>
+                    ) : null}
 
-                    <Field label="기대평 (200자 이내)">
-                      <textarea
-                        name="expectation"
-                        value={form.expectation}
+                    <Field
+                      label="3. 연락처 *"
+                      hint="연락 가능한 본인 연락처를 기입해 주세요. (부모님 등)"
+                    >
+                      <input
+                        name="phone"
+                        type="tel"
+                        value={form.phone}
                         onChange={handleChange}
-                        rows={2}
-                        maxLength={200}
-                        placeholder="행사에 기대하는 점을 적어 주세요."
-                        style={{
-                          ...inputStyle,
-                          fontSize: 'min(0.72rem, 2.8vw, 1.5vh)',
-                          resize: 'none',
-                          lineHeight: 1.35,
-                          paddingTop: '0.45vh',
-                        }}
+                        required
+                        placeholder="010-0000-0000"
+                        style={inputStyle}
                       />
                     </Field>
 
+                    <Field label="4. 성함 *" hint="구매자 본인 성함 기재">
+                      <input
+                        name="buyerName"
+                        value={form.buyerName}
+                        onChange={handleChange}
+                        required
+                        placeholder="예: 김하늘"
+                        style={inputStyle}
+                      />
+                    </Field>
+
+                    {isOffline ? (
+                      <Field
+                        label="5. (오프라인 구매 고객) 영수증 이미지 *"
+                        hint="구매하신 실물 영수증을 촬영하여 첨부해 주세요. 키즈 제품 20만원 이상 구매 영수증"
+                      >
+                        <label style={fileInputStyle}>
+                          <span className="truncate">
+                            {receiptFile ? receiptFile.name : '📎 영수증 이미지 첨부 (클릭)'}
+                          </span>
+                          <input
+                            name="receiptFile"
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp"
+                            capture="environment"
+                            onChange={handleFileChange}
+                            required={isOffline}
+                            className="sr-only"
+                          />
+                        </label>
+                      </Field>
+                    ) : null}
+
                     {error ? (
-                      <p className="font-sans text-[min(0.58rem,2.5vw,1.05vh)] text-[#b03020] md:text-[min(0.7rem,1.3vh)]">
+                      <p className="font-sans text-[min(0.58rem,2.5vw,1.05vh)] leading-[1.25] text-[#b03020] md:text-[min(0.66rem,1.2vh)]">
                         {error}
                       </p>
                     ) : null}
@@ -373,7 +468,7 @@ export default function WriteForm() {
                     form="rsvp-form"
                     disabled={isSubmitting}
                     style={buttonStyle}
-                    className="transition-colors duration-200 hover:bg-[#1a1008]/5"
+                    className="transition-colors duration-200 hover:bg-[#1a1008]/5 disabled:cursor-wait disabled:opacity-60"
                   >
                     {isSubmitting ? '접수 중' : '응모하기'}
                   </button>
@@ -387,12 +482,25 @@ export default function WriteForm() {
   )
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string
+  hint?: string
+  children: React.ReactNode
+}) {
   return (
-    <div className="flex min-w-0 flex-1 flex-col gap-[0.3vh] md:gap-[0.8vh]">
-      <label className="font-sans text-[min(0.52rem,2vw,0.9vh)] tracking-[0.06vh] text-[#9a7a50] italic uppercase md:text-[min(0.58rem,2.2vw,1.1vh)] md:tracking-[0.08vh]">
+    <div className="flex min-w-0 flex-1 flex-col gap-[0.25vh] md:gap-[0.42vh]">
+      <label className="font-sans text-[min(0.68rem,2.6vw,1.18vh)] font-semibold leading-[1.2] tracking-[0.03vh] text-[#2c1f0e] md:text-[min(0.72rem,2.2vw,1.3vh)]">
         {label}
       </label>
+      {hint ? (
+        <p className="font-sans text-[min(0.64rem,2.4vw,1.15vh)] leading-[1.3] text-[#4a3520]">
+          {hint}
+        </p>
+      ) : null}
       {children}
     </div>
   )
@@ -404,10 +512,32 @@ const inputStyle: React.CSSProperties = {
   borderBottom: '1px dashed rgba(80,50,20,0.28)',
   outline: 'none',
   fontFamily: 'var(--font-handwriting), cursive',
-  fontSize: '0.85rem',
+  fontSize: 'min(0.7rem, 2.65vw, 1.3vh)',
   color: '#1a1008',
   width: '100%',
   padding: '1px 0 3px',
+}
+
+const checkboxStyle: React.CSSProperties = {
+  accentColor: '#9a8060',
+  flex: '0 0 auto',
+  marginTop: '0.12rem',
+}
+
+const fileInputStyle: React.CSSProperties = {
+  alignItems: 'center',
+  justifyContent: 'center',
+  border: '1.5px dashed rgba(80,50,20,0.35)',
+  borderRadius: '4px',
+  color: '#1a1008',
+  cursor: 'pointer',
+  display: 'flex',
+  fontFamily: 'var(--font-handwriting), cursive',
+  fontSize: 'min(0.82rem, 3vw, 1.5vh)',
+  minHeight: '4vh',
+  padding: '0.8vh 1vh',
+  width: '100%',
+  background: 'rgba(154,128,96,0.06)',
 }
 
 const buttonStyle: React.CSSProperties = {
