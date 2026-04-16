@@ -668,7 +668,7 @@ const inputStyle: React.CSSProperties = {
   borderBottom: '1px dashed rgba(80,50,20,0.28)',
   outline: 'none',
   fontFamily: 'var(--font-handwriting), cursive',
-  fontSize: 'min(0.7rem, 2.65vw, 1.3vh)',
+  fontSize: 'min(0.82rem, 3vw, 1.5vh)',
   color: '#1a1008',
   width: '100%',
   padding: '1px 0 3px',

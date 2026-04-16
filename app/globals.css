@@ -61,3 +61,10 @@ html, body {
 .hint-text {
   animation: fadeSlideUp 0.8s ease 1.2s both;
 }
+
+/* Diary form placeholder */
+#rsvp-form input::placeholder {
+  color: #1a1008;
+  opacity: 0.7;
+  font-size: min(0.78rem, 2.8vw, 1.4vh);
+}
