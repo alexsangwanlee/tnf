@@ -172,9 +172,19 @@ export default async function AdminPage() {
                           href={receiptUrls[index]!}
                           target="_blank"
                           rel="noopener noreferrer"
-                          style={{ color: '#1a73a7', textDecoration: 'underline' }}
                         >
-                          {entry.receipt_file_name || '보기'}
+                          <img
+                            src={receiptUrls[index]!}
+                            alt={entry.receipt_file_name || '영수증'}
+                            style={{
+                              width: '80px',
+                              height: '80px',
+                              objectFit: 'cover',
+                              borderRadius: '4px',
+                              border: '1px solid #e0e0e0',
+                              cursor: 'pointer',
+                            }}
+                          />
                         </a>
                       ) : (
                         '-'
