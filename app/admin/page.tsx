@@ -91,7 +91,7 @@ export default async function AdminPage() {
             <p style={{ fontSize: '0.85rem', color: '#888' }}>총 {entries.length}건의 응모</p>
           </div>
           <a
-            href="/api/admin/export"
+            href="/api/admin/export?key=tnf2025"
             style={{
               background: '#2c2c2c',
               color: '#fff',

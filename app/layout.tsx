@@ -22,8 +22,23 @@ const nanumPen = Nanum_Pen_Script({
 })
 
 export const metadata: Metadata = {
-  title: 'TNF Kids x Beomjeop Secret Diary',
-  description: '잠금 코드를 풀고 입장하는 비밀 다이어리 RSVP 페이지',
+  title: 'THE NORTH FACE DANCECLASS',
+  description: 'BUMSUP과 함께하는 K-POP 댄스 클래스 | 노스페이스 키즈 특별 이벤트',
+  icons: {
+    icon: '/favicon.png',
+  },
+  openGraph: {
+    title: 'THE NORTH FACE DANCECLASS',
+    description: 'BUMSUP과 함께하는 K-POP 댄스 클래스에 초대합니다.',
+    images: ['/textures/tnf.png'],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'THE NORTH FACE DANCECLASS',
+    description: 'BUMSUP과 함께하는 K-POP 댄스 클래스에 초대합니다.',
+    images: ['/textures/tnf.png'],
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

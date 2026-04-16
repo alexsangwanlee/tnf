@@ -54,8 +54,31 @@ function getFileExtension(fileName: string) {
   return match ? match[0].toLowerCase() : '.jpg'
 }
 
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT_WINDOW = 60_000
+const RATE_LIMIT_MAX = 5
+
+function isRateLimited(ip: string) {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW })
+    return false
+  }
+  entry.count++
+  return entry.count > RATE_LIMIT_MAX
+}
+
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: '너무 많은 요청입니다. 잠시 후 다시 시도해 주세요.' },
+        { status: 429 }
+      )
+    }
+
     const contentType = req.headers.get('content-type') || ''
     let purchaseType: PurchaseType = 'online'
     let privacyAgreed = false

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 const RECEIPT_BUCKET = 'entry-receipts'
@@ -41,7 +41,12 @@ async function getReceiptUrl(supabase: SupabaseClient, path?: string | null) {
   return data.signedUrl
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const secret = req.nextUrl.searchParams.get('key')
+  if (secret !== 'tnf2025') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const supabaseUrl = process.env.SUPABASE_URL
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
