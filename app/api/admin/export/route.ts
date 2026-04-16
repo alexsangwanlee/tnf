@@ -23,10 +23,10 @@ function getPurchaseLabel(value: EntryRow['purchase_type']) {
   return '-'
 }
 
-async function downloadReceipt(supabase: SupabaseClient, path: string): Promise<Buffer | null> {
+async function downloadReceipt(supabase: SupabaseClient, path: string): Promise<Uint8Array | null> {
   const { data, error } = await supabase.storage.from(RECEIPT_BUCKET).download(path)
   if (error || !data) return null
-  return Buffer.from(await data.arrayBuffer())
+  return new Uint8Array(await data.arrayBuffer())
 }
 
 function getImageExtension(path: string): 'png' | 'jpeg' {
@@ -98,7 +98,7 @@ export async function GET(req: NextRequest) {
       if (imageBuffer) {
         const ext = getImageExtension(entry.receipt_file_path)
         const imageId = workbook.addImage({
-          buffer: imageBuffer,
+          buffer: imageBuffer as unknown as Buffer,
           extension: ext,
         })
 

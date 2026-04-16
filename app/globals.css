@@ -66,5 +66,17 @@ html, body {
 #rsvp-form input::placeholder {
   color: #1a1008;
   opacity: 0.7;
-  font-size: min(0.78rem, 2.8vw, 1.4vh);
+  font-size: min(0.78rem, 3.2vw, 1.4vh);
+}
+
+/* Mobile touch optimizations */
+@media (max-width: 767px) {
+  input, select, textarea, button {
+    font-size: 16px !important;
+  }
+}
+
+/* Prevent pull-to-refresh on diary pages */
+html {
+  overscroll-behavior: none;
 }

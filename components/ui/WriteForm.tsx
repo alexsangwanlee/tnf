@@ -163,6 +163,18 @@ export default function WriteForm() {
     if (currentSpread > 0) setCurrentSpread((s) => s - 1)
   }
 
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.touches[0].clientX)
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStart === null) return
+    const diff = touchStart - e.changedTouches[0].clientX
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) goNext()
+      else goPrev()
+    }
+    setTouchStart(null)
+  }
+
   if (gameState !== 'OPENED' && !isPopupPreview) return null
 
   return (
@@ -227,7 +239,7 @@ export default function WriteForm() {
         </div>
       ) : null}
 
-      <div className="flex min-h-full w-full items-start justify-center px-3 py-12 md:min-h-screen md:items-center md:px-0 md:py-0">
+      <div className="flex min-h-full w-full items-start justify-center px-2 py-4 md:min-h-screen md:items-center md:px-0 md:py-0">
         {isPopupPreview ? (
           <div className="absolute top-5 right-6 z-40 rounded-full border border-[rgba(111,83,52,0.18)] bg-[rgba(255,255,255,0.82)] px-4 py-2 font-sans text-[0.62rem] tracking-[0.16em] text-[#6a4d31] shadow-[0_10px_30px_rgba(0,0,0,0.08)] backdrop-blur-sm uppercase">
             Popup Preview
@@ -241,7 +253,11 @@ export default function WriteForm() {
           돌아가기
         </button>
 
-        <div className="relative flex w-full max-w-[1040px] flex-col items-center gap-3 rounded-[10px] bg-white p-3 shadow-[0_24px_70px_rgba(0,0,0,0.22)] md:w-auto md:max-w-none md:flex-row md:items-stretch md:justify-center md:gap-0 md:rounded-[8px] md:bg-transparent md:p-3">
+        <div
+          className="relative flex w-full max-w-[1040px] flex-col items-center gap-2 rounded-[10px] bg-white p-2 shadow-[0_24px_70px_rgba(0,0,0,0.22)] md:w-auto md:max-w-none md:flex-row md:items-stretch md:justify-center md:gap-0 md:rounded-[8px] md:bg-transparent md:p-3"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           <div
             className="absolute inset-0 hidden rounded-[8px] md:block"
             style={{
@@ -277,18 +293,22 @@ export default function WriteForm() {
             />
           )}
 
-          <div className="absolute -bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-3 md:-bottom-10">
+          <div className="absolute -bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-4 md:-bottom-10 md:gap-3">
             {Array.from({ length: TOTAL_SPREADS }).map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentSpread(i)}
-                className="h-2 w-2 rounded-full transition-all duration-200"
-                style={{
-                  background: i === currentSpread ? '#6b543c' : 'rgba(107,84,60,0.25)',
-                  transform: i === currentSpread ? 'scale(1.3)' : 'scale(1)',
-                }}
+                className="flex h-8 w-8 items-center justify-center md:h-auto md:w-auto"
                 aria-label={`페이지 ${i + 1}`}
-              />
+              >
+                <span
+                  className="block h-2.5 w-2.5 rounded-full transition-all duration-200 md:h-2 md:w-2"
+                  style={{
+                    background: i === currentSpread ? '#6b543c' : 'rgba(107,84,60,0.25)',
+                    transform: i === currentSpread ? 'scale(1.3)' : 'scale(1)',
+                  }}
+                />
+              </button>
             ))}
           </div>
         </div>
@@ -340,19 +360,19 @@ function IllustrationPage({
       {!isFirst && direction === 'left' && (
         <button
           onClick={onNavigate}
-          className="absolute top-1/2 left-3 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/60 text-[#3a2c18] shadow-md backdrop-blur-sm transition-all hover:bg-white/90 md:left-4 md:h-10 md:w-10"
+          className="absolute top-1/2 left-1 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-[#3a2c18] shadow-md backdrop-blur-sm transition-all active:scale-95 hover:bg-white/90 md:left-4 md:h-10 md:w-10"
           aria-label="이전 페이지"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
       )}
       {direction === 'right' && (
         <button
           onClick={onNavigate}
-          className="absolute top-1/2 right-3 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/60 text-[#3a2c18] shadow-md backdrop-blur-sm transition-all hover:bg-white/90 md:right-4 md:h-10 md:w-10"
+          className="absolute top-1/2 right-1 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-[#3a2c18] shadow-md backdrop-blur-sm transition-all active:scale-95 hover:bg-white/90 md:right-4 md:h-10 md:w-10"
           aria-label="다음 페이지"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
         </button>
       )}
     </div>
@@ -446,10 +466,10 @@ function InfoPage({ onNavigate }: { onNavigate: () => void }) {
 
       <button
         onClick={onNavigate}
-        className="absolute top-1/2 left-3 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/60 text-[#3a2c18] shadow-md backdrop-blur-sm transition-all hover:bg-white/90 md:left-4 md:h-10 md:w-10"
+        className="absolute top-1/2 left-1 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-[#3a2c18] shadow-md backdrop-blur-sm transition-all active:scale-95 hover:bg-white/90 md:left-4 md:h-10 md:w-10"
         aria-label="이전 페이지"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
     </div>
   )

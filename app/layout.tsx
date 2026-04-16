@@ -45,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko" className={`${cinzel.variable} ${gowunDodum.variable} ${nanumPen.variable} h-full`}>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         {PRELOAD_IMAGE_ASSETS.map((href) => (
           <link key={href} rel="preload" as="image" href={href} />
         ))}
