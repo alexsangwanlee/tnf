@@ -435,7 +435,7 @@ export default function WriteForm() {
                     {isOffline ? (
                       <Field
                         label="5. (오프라인 구매 고객) 영수증 이미지 *"
-                        hint="구매하신 실물 영수증을 촬영하여 첨부해 주세요. 키즈 제품 20만원 이상 구매 영수증"
+                        hint={"구매하신 실물 영수증을 촬영하여 첨부해 주세요.\n노스페이스 키즈 제품 20만원 이상 구매 영수증"}
                       >
                         <label style={fileInputStyle}>
                           <span className="truncate">
@@ -497,7 +497,7 @@ function Field({
         {label}
       </label>
       {hint ? (
-        <p className="font-sans text-[min(0.64rem,2.4vw,1.15vh)] leading-[1.3] text-[#4a3520]">
+        <p className="whitespace-pre-line font-sans text-[min(0.64rem,2.4vw,1.15vh)] leading-[1.3] text-[#4a3520]">
           {hint}
         </p>
       ) : null}
