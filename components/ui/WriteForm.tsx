@@ -455,7 +455,7 @@ function InfoPage({ onNavigate }: { onNavigate: () => void }) {
               <p>
                 <strong>모집 기간:</strong> 4/20(월) ~ 4/26(일)
               </p>
-              <p className="mt-[2.5vh] text-[min(0.6rem,2.8vw,1.2vh)] italic opacity-80">
+              <p className="mt-[2.5vh] text-[min(0.68rem,3vw,1.35vh)] font-semibold not-italic text-[#2c1f0e]">
                 보호자 동반 1인 포함, 총 2매 제공
               </p>
             </div>
@@ -534,7 +534,7 @@ function EntryFormPage({
                 구매 증빙 미충족 시 당첨 제외됩니다.
               </div>
 
-              <div className="py-[0.6vh]" />
+              <div className="py-[1.2vh]" />
 
               <Field label="1. 개인 정보 동의 *">
                 <label className="flex min-w-0 items-start gap-2 font-sans text-[min(0.65rem,2.5vw,1.15vh)] leading-[1.25] text-[#2c1f0e]">
