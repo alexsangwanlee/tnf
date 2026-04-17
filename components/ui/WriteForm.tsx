@@ -267,19 +267,24 @@ export default function WriteForm() {
             }}
           />
 
-          {currentSpread === 0 && <IllustrationPage src={ILLUSTRATION_PAGES[0]} onNavigate={handleBack} direction="left" isFirst />}
-          {currentSpread === 0 && <SpineDivider />}
-          {currentSpread === 0 && <IllustrationPage src={ILLUSTRATION_PAGES[1]} onNavigate={goNext} direction="right" />}
+          {/* Spread 0 */}
+          <div className={`contents ${currentSpread === 0 ? '' : 'hidden'}`}>
+            <IllustrationPage src={ILLUSTRATION_PAGES[0]} onNavigate={handleBack} direction="left" isFirst />
+            <SpineDivider />
+            <IllustrationPage src={ILLUSTRATION_PAGES[1]} onNavigate={goNext} direction="right" />
+          </div>
 
-          {currentSpread === 1 && <IllustrationPage src={ILLUSTRATION_PAGES[2]} onNavigate={goPrev} direction="left" />}
-          {currentSpread === 1 && <SpineDivider />}
-          {currentSpread === 1 && <IllustrationPage src={ILLUSTRATION_PAGES[3]} onNavigate={goNext} direction="right" />}
+          {/* Spread 1 */}
+          <div className={`contents ${currentSpread === 1 ? '' : 'hidden'}`}>
+            <IllustrationPage src={ILLUSTRATION_PAGES[2]} onNavigate={goPrev} direction="left" />
+            <SpineDivider />
+            <IllustrationPage src={ILLUSTRATION_PAGES[3]} onNavigate={goNext} direction="right" />
+          </div>
 
-          {currentSpread === 2 && (
+          {/* Spread 2 */}
+          <div className={`contents ${currentSpread === 2 ? '' : 'hidden'}`}>
             <InfoPage onNavigate={goPrev} />
-          )}
-          {currentSpread === 2 && <SpineDivider />}
-          {currentSpread === 2 && (
+            <SpineDivider />
             <EntryFormPage
               form={form}
               receiptFile={receiptFile}
@@ -291,7 +296,7 @@ export default function WriteForm() {
               onFileChange={handleFileChange}
               onSubmit={handleSubmit}
             />
-          )}
+          </div>
 
           <div className="absolute -bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-4 md:-bottom-10 md:gap-3">
             {Array.from({ length: TOTAL_SPREADS }).map((_, i) => (
@@ -497,7 +502,7 @@ function EntryFormPage({
   onSubmit: (event: React.FormEvent) => void
 }) {
   return (
-    <div className="relative mx-auto flex aspect-[5/7] w-[94%] max-w-[480px] flex-shrink-0 flex-col overflow-hidden pb-10 shadow-xl md:mx-0 md:w-[min(52vh,520px)] md:pb-0 md:shadow-none">
+    <div className="relative mx-auto flex aspect-[5/7] w-[94%] max-w-[480px] flex-shrink-0 flex-col overflow-hidden shadow-xl md:mx-0 md:w-[min(52vh,520px)] md:shadow-none">
       <img
         src="/textures/inner.png"
         alt=""
