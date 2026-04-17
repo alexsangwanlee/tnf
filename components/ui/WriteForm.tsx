@@ -843,10 +843,10 @@ const fileInputStyle: React.CSSProperties = {
 const buttonStyle: React.CSSProperties = {
   background: 'transparent',
   border: '1px solid rgba(40,25,5,0.32)',
-  padding: 'clamp(0.35rem, 0.55vh, 0.8vh) clamp(0.9rem, 2.2vh, 3vh)',
+  padding: 'min(0.5rem, 1.4vw) min(1.2rem, 3.5vw)',
   fontFamily: 'var(--font-serif)',
-  fontSize: 'clamp(0.62rem, 2.2vw, 0.75rem)',
-  letterSpacing: 'clamp(0.12rem, 0.24vh, 0.4vh)',
+  fontSize: 'min(0.75rem, 2.2vw)',
+  letterSpacing: 'min(0.16rem, 0.5vw)',
   color: '#1a1008',
   cursor: 'pointer',
 }
