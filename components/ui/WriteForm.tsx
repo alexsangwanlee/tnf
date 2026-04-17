@@ -766,7 +766,7 @@ function EntryFormPage({
             </form>
           </div>
 
-          <div className="flex justify-center pt-1.5 md:pt-2">
+          <div className="flex justify-center" style={{ marginTop: 'max(-1.5vh, -10px)' }}>
             <button
               type="submit"
               form="rsvp-form"
