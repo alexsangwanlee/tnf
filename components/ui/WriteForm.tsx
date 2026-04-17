@@ -248,7 +248,7 @@ export default function WriteForm() {
 
         <button
           onClick={handleBack}
-          className="absolute top-5 left-6 z-40 border-none bg-transparent font-sans text-xs tracking-widest text-[#3c280a]/50 transition-colors hover:text-[#3c280a]/90"
+          className="absolute top-5 left-6 z-40 border-none bg-transparent font-sans text-sm tracking-widest text-[#3c280a]/60 transition-colors hover:text-[#3c280a]/90"
         >
           돌아가기
         </button>
@@ -267,7 +267,7 @@ export default function WriteForm() {
             }}
           />
 
-          {currentSpread === 0 && <IllustrationPage src={ILLUSTRATION_PAGES[0]} onNavigate={goPrev} direction="left" isFirst />}
+          {currentSpread === 0 && <IllustrationPage src={ILLUSTRATION_PAGES[0]} onNavigate={handleBack} direction="left" isFirst />}
           {currentSpread === 0 && <SpineDivider />}
           {currentSpread === 0 && <IllustrationPage src={ILLUSTRATION_PAGES[1]} onNavigate={goNext} direction="right" />}
 
@@ -357,7 +357,7 @@ function IllustrationPage({
           draggable={false}
         />
       </div>
-      {!isFirst && direction === 'left' && (
+      {direction === 'left' && (
         <button
           onClick={onNavigate}
           className="absolute top-1/2 left-1 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-[#3a2c18] shadow-md backdrop-blur-sm transition-all active:scale-95 hover:bg-white/90 md:left-4 md:h-10 md:w-10"
