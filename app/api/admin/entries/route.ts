@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-
-const ADMIN_KEY = 'tnf2025'
+import { isAdminAuthed } from '@/lib/adminAuth'
 
 function getSupabase() {
   const url = process.env.SUPABASE_URL
@@ -14,8 +13,8 @@ function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 }
 
-export async function GET(req: NextRequest) {
-  if (req.nextUrl.searchParams.get('key') !== ADMIN_KEY) return unauthorized()
+export async function GET() {
+  if (!(await isAdminAuthed())) return unauthorized()
 
   const supabase = getSupabase()
   if (!supabase) return NextResponse.json({ error: 'Not configured' }, { status: 500 })
@@ -46,7 +45,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (req.nextUrl.searchParams.get('key') !== ADMIN_KEY) return unauthorized()
+  if (!(await isAdminAuthed())) return unauthorized()
 
   const supabase = getSupabase()
   if (!supabase) return NextResponse.json({ error: 'Not configured' }, { status: 500 })
@@ -75,7 +74,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  if (req.nextUrl.searchParams.get('key') !== ADMIN_KEY) return unauthorized()
+  if (!(await isAdminAuthed())) return unauthorized()
 
   const supabase = getSupabase()
   if (!supabase) return NextResponse.json({ error: 'Not configured' }, { status: 500 })

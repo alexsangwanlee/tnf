@@ -16,8 +16,6 @@ interface Entry {
   created_at: string
 }
 
-const KEY = 'tnf2025'
-
 const headings = ['#', '구매방식', '개인정보동의', '성함', '연락처', '공식몰 ID', '영수증', '신청일시', '']
 
 export default function AdminPage() {
@@ -35,7 +33,7 @@ export default function AdminPage() {
 
   const fetchEntries = useCallback(async () => {
     setLoading(true)
-    const res = await fetch(`/api/admin/entries?key=${KEY}`)
+    const res = await fetch(`/api/admin/entries`)
     if (res.ok) setEntries(await res.json())
     setLoading(false)
   }, [])
@@ -44,7 +42,7 @@ export default function AdminPage() {
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`"${name}" 응모를 삭제하시겠습니까?`)) return
-    const res = await fetch(`/api/admin/entries?key=${KEY}`, {
+    const res = await fetch(`/api/admin/entries`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
@@ -65,7 +63,7 @@ export default function AdminPage() {
       return
     }
 
-    const res = await fetch(`/api/admin/entries?key=${KEY}`, {
+    const res = await fetch(`/api/admin/entries`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(addForm),
@@ -213,7 +211,7 @@ export default function AdminPage() {
             <button onClick={() => setShowAddForm(!showAddForm)} className="admin-btn" style={{ background: '#1a73a7' }}>
               {showAddForm ? '취소' : '+ 추가'}
             </button>
-            <a href={`/api/admin/export?key=${KEY}`} className="admin-btn" style={{ background: '#2c2c2c' }}>
+            <a href={`/api/admin/export`} className="admin-btn" style={{ background: '#2c2c2c' }}>
               EXPORT EXCEL
             </a>
           </div>

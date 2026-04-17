@@ -9,6 +9,7 @@ const MAX_RECEIPT_SIZE = 10 * 1024 * 1024
 interface EntryPayload {
   purchaseType?: unknown
   privacyAgreed?: unknown
+  orderNumber?: unknown
   officialMallId?: unknown
   phone?: unknown
   buyerName?: unknown
@@ -54,34 +55,14 @@ function getFileExtension(fileName: string) {
   return match ? match[0].toLowerCase() : '.jpg'
 }
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-const RATE_LIMIT_WINDOW = 60_000
-const RATE_LIMIT_MAX = 5
-
-function isRateLimited(ip: string) {
-  const now = Date.now()
-  const entry = rateLimitMap.get(ip)
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW })
-    return false
-  }
-  entry.count++
-  return entry.count > RATE_LIMIT_MAX
-}
+const DUPLICATE_WINDOW_MS = 60_000
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-    if (isRateLimited(ip)) {
-      return NextResponse.json(
-        { error: '너무 많은 요청입니다. 잠시 후 다시 시도해 주세요.' },
-        { status: 429 }
-      )
-    }
-
     const contentType = req.headers.get('content-type') || ''
     let purchaseType: PurchaseType = 'online'
     let privacyAgreed = false
+    let orderNumber = ''
     let officialMallId = ''
     let phone = ''
     let buyerName = ''
@@ -91,6 +72,7 @@ export async function POST(req: NextRequest) {
       const formData = await req.formData()
       purchaseType = toPurchaseType(formData.get('purchaseType'))
       privacyAgreed = toBoolean(formData.get('privacyAgreed'))
+      orderNumber = toTrimmedString(formData.get('orderNumber'))
       officialMallId = toTrimmedString(formData.get('officialMallId'))
       phone = toTrimmedString(formData.get('phone'))
       buyerName = toTrimmedString(formData.get('buyerName'))
@@ -101,6 +83,7 @@ export async function POST(req: NextRequest) {
       const payload = (await req.json()) as EntryPayload
       purchaseType = toPurchaseType(payload.purchaseType)
       privacyAgreed = toBoolean(payload.privacyAgreed)
+      orderNumber = toTrimmedString(payload.orderNumber)
       officialMallId = toTrimmedString(payload.officialMallId)
       phone = toTrimmedString(payload.phone)
       buyerName = toTrimmedString(payload.buyerName) || toTrimmedString(payload.name)
@@ -111,6 +94,10 @@ export async function POST(req: NextRequest) {
         { error: '개인 정보 수집 및 이용 동의가 필요합니다.' },
         { status: 400 }
       )
+    }
+
+    if (!orderNumber) {
+      return NextResponse.json({ error: '주문 번호를 입력해 주세요.' }, { status: 400 })
     }
 
     if (!phone || !buyerName) {
@@ -153,6 +140,24 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const recentCutoff = new Date(Date.now() - DUPLICATE_WINDOW_MS).toISOString()
+    const { data: recent, error: recentError } = await supabase
+      .from('entries')
+      .select('id')
+      .eq('phone', phone)
+      .gte('created_at', recentCutoff)
+      .limit(1)
+
+    if (recentError) {
+      console.error('Duplicate check error:', recentError)
+    } else if (recent && recent.length > 0) {
+      return NextResponse.json(
+        { error: '이미 접수된 요청이 있습니다. 잠시 후 다시 시도해 주세요.' },
+        { status: 429 }
+      )
+    }
+
     let receiptFilePath: string | null = null
     let receiptFileName: string | null = null
 
@@ -182,6 +187,7 @@ export async function POST(req: NextRequest) {
       expectation: null,
       purchase_type: purchaseType,
       privacy_agreed: privacyAgreed,
+      order_number: orderNumber || null,
       official_mall_id: officialMallId || null,
       buyer_name: buyerName,
       receipt_file_name: receiptFileName,

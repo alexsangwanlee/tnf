@@ -38,7 +38,7 @@ export default function PadlockModel({ position }: PadlockModelProps) {
 
   // Shackle opens when unlocking
   if (isUnlocked && targetShackleAngle.current === 0) {
-    targetShackleAngle.current = Math.PI * 0.6
+    targetShackleAngle.current = -Math.PI * 0.6
   }
   if (!isUnlocked) {
     targetShackleAngle.current = 0

@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import ExcelJS from 'exceljs'
+import { isAdminAuthed } from '@/lib/adminAuth'
 
 const RECEIPT_BUCKET = 'entry-receipts'
 
@@ -37,9 +38,8 @@ function getImageExtension(path: string): 'png' | 'jpeg' {
   return 'jpeg'
 }
 
-export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get('key')
-  if (secret !== 'tnf2025') {
+export async function GET() {
+  if (!(await isAdminAuthed())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

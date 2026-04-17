@@ -1,22 +1,73 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
-
-const ADMIN_CODE = 'tnf2025'
+import { useEffect, useState, type ReactNode } from 'react'
 
 export default function AdminAuth({ children }: { children: ReactNode }) {
   const [authed, setAuthed] = useState(false)
+  const [checking, setChecking] = useState(true)
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (code === ADMIN_CODE) {
-      setAuthed(true)
-      setError('')
-    } else {
-      setError('잘못된 코드입니다.')
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/admin/auth')
+      .then((res) => (res.ok ? res.json() : { authed: false }))
+      .then((data) => {
+        if (!cancelled) setAuthed(Boolean(data?.authed))
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setChecking(false)
+      })
+    return () => {
+      cancelled = true
     }
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: code }),
+      })
+
+      if (res.ok) {
+        setAuthed(true)
+      } else {
+        const data = await res.json().catch(() => null)
+        setError(data?.error || '잘못된 코드입니다.')
+      }
+    } catch {
+      setError('오류가 발생했습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (checking) {
+    return (
+      <main
+        style={{
+          minHeight: '100vh',
+          background: '#FCFCFC',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'system-ui, sans-serif',
+          color: '#888',
+          fontSize: '0.85rem',
+          letterSpacing: '2px',
+        }}
+      >
+        확인 중...
+      </main>
+    )
   }
 
   if (authed) return <>{children}</>
@@ -66,18 +117,19 @@ export default function AdminAuth({ children }: { children: ReactNode }) {
         {error && <p style={{ color: '#c03020', fontSize: '0.8rem', margin: 0 }}>{error}</p>}
         <button
           type="submit"
+          disabled={loading}
           style={{
-            background: '#2c2c2c',
+            background: loading ? '#999' : '#2c2c2c',
             color: '#fff',
             padding: '10px 28px',
             fontSize: '0.75rem',
             letterSpacing: '2px',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'pointer',
+            cursor: loading ? 'wait' : 'pointer',
           }}
         >
-          확인
+          {loading ? '확인 중' : '확인'}
         </button>
       </form>
     </main>

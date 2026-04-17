@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS entries (
   purchase_type TEXT NOT NULL DEFAULT 'online',
   privacy_agreed BOOLEAN NOT NULL DEFAULT false,
   official_mall_id TEXT,
+  order_number TEXT,
   buyer_name TEXT,
   receipt_file_name TEXT,
   receipt_file_path TEXT,
@@ -24,6 +25,7 @@ ALTER TABLE entries ALTER COLUMN relationship SET NOT NULL;
 ALTER TABLE entries ADD COLUMN IF NOT EXISTS purchase_type TEXT NOT NULL DEFAULT 'online';
 ALTER TABLE entries ADD COLUMN IF NOT EXISTS privacy_agreed BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE entries ADD COLUMN IF NOT EXISTS official_mall_id TEXT;
+ALTER TABLE entries ADD COLUMN IF NOT EXISTS order_number TEXT;
 ALTER TABLE entries ADD COLUMN IF NOT EXISTS buyer_name TEXT;
 ALTER TABLE entries ADD COLUMN IF NOT EXISTS receipt_file_name TEXT;
 ALTER TABLE entries ADD COLUMN IF NOT EXISTS receipt_file_path TEXT;
