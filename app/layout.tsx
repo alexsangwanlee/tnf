@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Cinzel, Nanum_Pen_Script } from 'next/font/google'
+import Script from 'next/script'
 import { PRELOAD_IMAGE_ASSETS } from '@/lib/assetPreload'
 import './globals.css'
 
@@ -45,7 +46,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <link key={href} rel="preload" as="image" href={href} />
         ))}
       </head>
-      <body className="h-full overflow-hidden" suppressHydrationWarning>{children}</body>
+      <body className="h-full overflow-hidden" suppressHydrationWarning>
+        {children}
+        <Script id="chatbase-widget" strategy="lazyOnload">{`
+(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="${process.env.NEXT_PUBLIC_CHATBASE_HOST}embed.min.js";script.id="${process.env.NEXT_PUBLIC_CHATBOT_ID}";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+        `}</Script>
+      </body>
     </html>
   )
 }

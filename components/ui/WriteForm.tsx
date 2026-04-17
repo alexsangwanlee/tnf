@@ -555,7 +555,7 @@ function EntryFormPage({
 
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="flex h-[82%] w-[58%] -translate-y-[5%] flex-col justify-between md:h-[84%] md:w-[58%] md:translate-y-[1%]" style={{ paddingBottom: '12%' }}>
-          <div className="flex flex-1 flex-col" style={{ paddingTop: 'max(3vh, 16px)' }}>
+          <div className="flex flex-1 flex-col overflow-y-auto scrollbar-hide" style={{ paddingTop: 'max(3vh, 16px)' }}>
             <h2 className="text-center font-serif text-[min(1rem,4.8vw)] leading-[1.1] tracking-[0.08em] text-[#1a1008] opacity-90 uppercase" style={{ marginBottom: 'max(2vh, 10px)' }}>
               ENTRY
             </h2>
@@ -771,12 +771,7 @@ function EntryFormPage({
               type="submit"
               form="rsvp-form"
               disabled={isSubmitting}
-              style={{
-                ...buttonStyle,
-                fontSize: 'min(0.75rem, 2.4vw)',
-                padding: 'min(0.45rem, 1.3vw) min(1rem, 3.2vw)',
-                letterSpacing: 'min(0.15rem, 0.5vw)',
-              }}
+              style={buttonStyle}
               className="transition-colors duration-200 hover:bg-[#1a1008]/5 disabled:cursor-wait disabled:opacity-60"
             >
               {isSubmitting ? '접수 중' : '응모하기'}
@@ -803,7 +798,7 @@ function Field({
     <div className="flex min-w-0 flex-1 flex-col" style={{ gap: 'max(0.25vh, 2px)' }}>
       <label
         htmlFor={htmlFor}
-        className="font-sans text-[min(0.72rem,2.8vw)] font-semibold leading-[1.2] tracking-[0.02em] text-[#2c1f0e] md:text-[min(0.76rem,2.4vw)]"
+        className="font-sans text-[min(0.72rem,2.8vw)] font-semibold leading-[1.2] tracking-[0.02em] text-[#2c1f0e]"
       >
         {label}
       </label>
@@ -848,10 +843,10 @@ const fileInputStyle: React.CSSProperties = {
 const buttonStyle: React.CSSProperties = {
   background: 'transparent',
   border: '1px solid rgba(40,25,5,0.32)',
-  padding: 'min(0.5rem, 1.4vw) min(1.2rem, 3.5vw)',
+  padding: 'min(0.4rem, 1.2vw) min(1rem, 3vw)',
   fontFamily: 'var(--font-serif)',
-  fontSize: 'min(0.75rem, 2.2vw)',
-  letterSpacing: 'min(0.16rem, 0.5vw)',
+  fontSize: 'min(0.72rem, 2.4vw)',
+  letterSpacing: 'min(0.14rem, 0.45vw)',
   color: '#1a1008',
   cursor: 'pointer',
 }
