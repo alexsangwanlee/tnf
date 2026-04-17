@@ -4,6 +4,11 @@
   --color-bg: #FCFCFC;
   --color-text: #2c2c2c;
   --color-accent: #888;
+  --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
 }
 
 *, *::before, *::after {

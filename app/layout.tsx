@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Cinzel, Gowun_Dodum, Nanum_Pen_Script } from 'next/font/google'
+import { Cinzel, Nanum_Pen_Script } from 'next/font/google'
 import { PRELOAD_IMAGE_ASSETS } from '@/lib/assetPreload'
 import './globals.css'
 
@@ -7,12 +7,6 @@ const cinzel = Cinzel({
   variable: '--font-serif',
   subsets: ['latin'],
   weight: ['400', '600', '700'],
-})
-
-const gowunDodum = Gowun_Dodum({
-  variable: '--font-sans',
-  subsets: ['latin'],
-  weight: ['400'],
 })
 
 const nanumPen = Nanum_Pen_Script({
@@ -43,9 +37,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className={`${cinzel.variable} ${gowunDodum.variable} ${nanumPen.variable} h-full`}>
+    <html lang="ko" className={`${cinzel.variable} ${nanumPen.variable} h-full`}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
         {PRELOAD_IMAGE_ASSETS.map((href) => (
           <link key={href} rel="preload" as="image" href={href} />
         ))}
