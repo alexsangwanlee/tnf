@@ -773,9 +773,9 @@ function EntryFormPage({
               disabled={isSubmitting}
               style={{
                 ...buttonStyle,
-                fontSize: 'min(0.75rem, 2.2vw)',
-                padding: 'min(0.45rem, 1.1vw) min(1rem, 2.8vw)',
-                letterSpacing: 'min(0.15rem, 0.45vw)',
+                fontSize: 'min(0.75rem, 2.4vw)',
+                padding: 'min(0.45rem, 1.3vw) min(1rem, 3.2vw)',
+                letterSpacing: 'min(0.15rem, 0.5vw)',
               }}
               className="transition-colors duration-200 hover:bg-[#1a1008]/5 disabled:cursor-wait disabled:opacity-60"
             >
