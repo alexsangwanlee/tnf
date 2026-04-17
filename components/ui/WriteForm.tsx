@@ -450,7 +450,7 @@ function InfoPage({ onNavigate }: { onNavigate: () => void }) {
               <p>
                 <strong>모집 기간:</strong> 4/20(월) ~ 4/26(일)
               </p>
-              <p className="mt-[1.2vh] text-[min(0.6rem,2.8vw,1.2vh)] italic opacity-80">
+              <p className="mt-[2.5vh] text-[min(0.6rem,2.8vw,1.2vh)] italic opacity-80">
                 보호자 동반 1인 포함, 총 2매 제공
               </p>
             </div>
