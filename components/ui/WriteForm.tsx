@@ -529,6 +529,8 @@ function EntryFormPage({
                 구매 증빙 미충족 시 당첨 제외됩니다.
               </div>
 
+              <div className="py-[0.6vh]" />
+
               <Field label="1. 개인 정보 동의 *">
                 <label className="flex min-w-0 items-start gap-2 font-sans text-[min(0.65rem,2.5vw,1.15vh)] leading-[1.25] text-[#2c1f0e]">
                   <input
