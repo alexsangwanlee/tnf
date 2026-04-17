@@ -771,7 +771,12 @@ function EntryFormPage({
               type="submit"
               form="rsvp-form"
               disabled={isSubmitting}
-              style={buttonStyle}
+              style={{
+                ...buttonStyle,
+                fontSize: 'min(0.7rem, 1.9vw)',
+                padding: '1vw 2.8vw',
+                letterSpacing: '0.4vw',
+              }}
               className="transition-colors duration-200 hover:bg-[#1a1008]/5 disabled:cursor-wait disabled:opacity-60"
             >
               {isSubmitting ? '접수 중' : '응모하기'}
