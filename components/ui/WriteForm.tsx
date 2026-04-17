@@ -431,7 +431,7 @@ function InfoPage({ onNavigate }: { onNavigate: () => void }) {
       />
 
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex h-[82%] w-[68%] translate-y-[5%] flex-col md:h-[84%] md:w-[68%] md:translate-y-[4%]">
+        <div className="flex h-[82%] w-[68%] translate-y-[2%] flex-col md:h-[84%] md:w-[68%] md:translate-y-[1%]">
           <div className="flex select-none items-center justify-center" style={{ marginBottom: 'max(3.5vh, 14px)' }}>
             <Image
               src="/textures/tnf.png"
@@ -554,7 +554,7 @@ function EntryFormPage({
       />
 
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex h-[78%] w-[58%] -translate-y-[7%] flex-col justify-between md:h-[80%] md:w-[58%] md:-translate-y-[10%]">
+        <div className="flex h-[78%] w-[58%] -translate-y-[2%] flex-col justify-between md:h-[80%] md:w-[58%] md:-translate-y-[4%]">
           <div className="flex flex-1 flex-col" style={{ paddingTop: 'max(3vh, 16px)' }}>
             <h2 className="text-center font-serif text-[min(1rem,4.8vw)] leading-[1.1] tracking-[0.08em] text-[#1a1008] opacity-90 uppercase" style={{ marginBottom: 'max(2vh, 10px)' }}>
               ENTRY
