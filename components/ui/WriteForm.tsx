@@ -451,7 +451,7 @@ function InfoPage({ onNavigate }: { onNavigate: () => void }) {
                 <strong>모집 기간:</strong> 4/20(월) ~ 4/26(일)
               </p>
               <p className="mt-[1.2vh] text-[min(0.6rem,2.8vw,1.2vh)] italic opacity-80">
-                노스페이스 키즈 제품 20만원 이상 구매 고객 한정
+                보호자 동반 1인 포함, 총 2매 제공
               </p>
             </div>
           </div>
