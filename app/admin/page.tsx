@@ -8,6 +8,7 @@ interface Entry {
   phone: string
   purchase_type: 'online' | 'offline'
   privacy_agreed: boolean
+  order_number?: string | null
   official_mall_id?: string | null
   buyer_name?: string | null
   receipt_file_name?: string | null
@@ -16,7 +17,7 @@ interface Entry {
   created_at: string
 }
 
-const headings = ['#', '구매방식', '개인정보동의', '성함', '연락처', '공식몰 ID', '영수증', '신청일시', '']
+const headings = ['#', '구매방식', '개인정보동의', '성함', '연락처', '주문번호', '공식몰 ID', '영수증', '신청일시', '']
 
 export default function AdminPage() {
   const [entries, setEntries] = useState<Entry[]>([])
@@ -26,6 +27,7 @@ export default function AdminPage() {
     purchaseType: 'online' as 'online' | 'offline',
     buyerName: '',
     phone: '',
+    orderNumber: '',
     officialMallId: '',
     privacyAgreed: true,
   })
@@ -71,7 +73,7 @@ export default function AdminPage() {
 
     if (res.ok) {
       setShowAddForm(false)
-      setAddForm({ purchaseType: 'online', buyerName: '', phone: '', officialMallId: '', privacyAgreed: true })
+      setAddForm({ purchaseType: 'online', buyerName: '', phone: '', orderNumber: '', officialMallId: '', privacyAgreed: true })
       await fetchEntries()
     } else {
       const data = await res.json().catch(() => null)
@@ -235,6 +237,10 @@ export default function AdminPage() {
               </select>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+              <label style={{ fontSize: '0.72rem', fontWeight: 600, color: '#444' }}>주문번호</label>
+              <input value={addForm.orderNumber} onChange={(e) => setAddForm((p) => ({ ...p, orderNumber: e.target.value }))} placeholder="20240510-123456" />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
               <label style={{ fontSize: '0.72rem', fontWeight: 600, color: '#444' }}>공식몰 ID</label>
               <input value={addForm.officialMallId} onChange={(e) => setAddForm((p) => ({ ...p, officialMallId: e.target.value }))} placeholder="tnfkids123" />
             </div>
@@ -274,6 +280,10 @@ export default function AdminPage() {
                     <span style={{ color: entry.privacy_agreed ? '#2a8540' : '#c03020' }}>
                       {entry.privacy_agreed ? '동의' : '미동의'}
                     </span>
+                  </div>
+                  <div className="entry-card-row">
+                    <span className="entry-card-label">주문번호</span>
+                    <span className="entry-card-value">{entry.order_number || '-'}</span>
                   </div>
                   <div className="entry-card-row">
                     <span className="entry-card-label">공식몰 ID</span>
@@ -326,6 +336,7 @@ export default function AdminPage() {
                       </td>
                       <td className="cell" style={{ fontWeight: 500 }}>{entry.buyer_name || entry.name}</td>
                       <td className="cell">{entry.phone}</td>
+                      <td className="cell">{entry.order_number || '-'}</td>
                       <td className="cell">{entry.official_mall_id || '-'}</td>
                       <td className="cell">
                         {entry.receipt_url ? (
