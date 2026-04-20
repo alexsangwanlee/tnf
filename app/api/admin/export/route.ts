@@ -11,6 +11,7 @@ interface EntryRow {
   relationship?: string | null
   purchase_type?: 'online' | 'offline' | null
   privacy_agreed?: boolean | null
+  order_number?: string | null
   official_mall_id?: string | null
   buyer_name?: string | null
   receipt_file_name?: string | null
@@ -65,7 +66,7 @@ export async function GET() {
   const workbook = new ExcelJS.Workbook()
   const sheet = workbook.addWorksheet('응모 목록')
 
-  const headers = ['번호', '구매 방식', '개인 정보 동의', '공식몰 회원 ID', '연락처', '성함', '영수증', '신청일시']
+  const headers = ['번호', '구매 방식', '개인 정보 동의', '주문번호', '공식몰 회원 ID', '연락처', '성함', '영수증', '신청일시']
   const headerRow = sheet.addRow(headers)
   headerRow.font = { bold: true, size: 11 }
   headerRow.alignment = { vertical: 'middle', horizontal: 'center' }
@@ -74,6 +75,7 @@ export async function GET() {
     { width: 6 },
     { width: 12 },
     { width: 14 },
+    { width: 22 },
     { width: 20 },
     { width: 16 },
     { width: 12 },
@@ -87,6 +89,7 @@ export async function GET() {
       i + 1,
       getPurchaseLabel(entry.purchase_type),
       entry.privacy_agreed ? '동의' : '미동의',
+      entry.order_number || '-',
       entry.official_mall_id || '-',
       entry.phone,
       entry.buyer_name || entry.name,
@@ -107,7 +110,7 @@ export async function GET() {
 
         const rowIndex = i + 1
         sheet.addImage(imageId, {
-          tl: { col: 6, row: rowIndex },
+          tl: { col: 7, row: rowIndex },
           ext: { width: 120, height: 120 },
         })
 
