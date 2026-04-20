@@ -431,7 +431,7 @@ function InfoPage({ onNavigate }: { onNavigate: () => void }) {
       />
 
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex h-[82%] w-[68%] translate-y-[2%] flex-col md:h-[84%] md:w-[68%] md:translate-y-[1%]">
+        <div className="flex h-[78%] w-[68%] -translate-y-[5%] flex-col md:h-[84%] md:w-[68%] md:translate-y-[1%]">
           <div className="flex select-none items-center justify-center" style={{ marginBottom: 'max(3.5vh, 14px)' }}>
             <Image
               src="/textures/tnf.png"
@@ -499,10 +499,14 @@ function InfoPage({ onNavigate }: { onNavigate: () => void }) {
                 border: '1px solid rgba(80,50,20,0.2)',
                 background: 'rgba(255,255,255,0.08)',
                 borderRadius: '2px',
+                wordBreak: 'keep-all',
+                overflowWrap: 'break-word',
               }}
             >
               <p style={{ fontWeight: 600, marginBottom: 'max(0.5vh, 4px)' }}>유의 사항</p>
-              <p style={{ marginBottom: 'max(0.4vh, 3px)' }}>· 본 행사장은 별도 주차 공간이 마련되어 있지 않으니, 가급적 대중교통 이용을 부탁 드립니다.</p>
+              <p style={{ marginBottom: 'max(0.4vh, 3px)', whiteSpace: 'nowrap' }}>
+                · 본 행사장은 주차공간이 마련되어 있지 않으니, 대중교통 이용을 부탁드립니다.
+              </p>
               <p style={{ marginBottom: 'max(0.4vh, 3px)' }}>· 당첨 후 사전 연락 없이 불참 시, 향후 유사 이벤트 참여에 제한이 있을 수 있습니다.</p>
               <p style={{ marginBottom: 'max(0.4vh, 3px)' }}>· 불참 시 취소는 5/6(수) 오전까지 상담 챗봇을 통해 요청 부탁드리며, 이후에는 어떤 사유로도 취소 불가한 점 양해 부탁드립니다.</p>
               <p>· <strong>행사 문의처:</strong> URL 하단 상담 챗봇 운영 (*오전 9시 ~ 오후 6시)</p>
@@ -554,7 +558,7 @@ function EntryFormPage({
       />
 
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex h-[82%] w-[58%] -translate-y-[5%] flex-col justify-between md:h-[84%] md:w-[58%] md:translate-y-[1%]" style={{ paddingBottom: '12%' }}>
+        <div className="flex h-[82%] w-[68%] -translate-y-[4%] flex-col justify-between md:h-[84%] md:w-[58%] md:translate-y-[1%]" style={{ paddingBottom: '12%' }}>
           <div className="flex flex-1 flex-col overflow-y-auto scrollbar-hide" style={{ paddingTop: 'max(3vh, 16px)' }}>
             <h2 className="text-center font-serif text-[min(1rem,4.8vw)] leading-[1.1] tracking-[0.08em] text-[#1a1008] opacity-90 uppercase" style={{ marginBottom: 'max(2vh, 10px)' }}>
               ENTRY
