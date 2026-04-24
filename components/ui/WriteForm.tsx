@@ -120,7 +120,7 @@ export default function WriteForm() {
       return
     }
 
-    if (!form.orderNumber.trim()) {
+    if (form.purchaseType === 'online' && !form.orderNumber.trim()) {
       setError('주문 번호를 입력해 주세요.')
       return
     }

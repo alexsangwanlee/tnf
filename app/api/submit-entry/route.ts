@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    if (!orderNumber) {
+    if (purchaseType === 'online' && !orderNumber) {
       return NextResponse.json({ error: '주문 번호를 입력해 주세요.' }, { status: 400 })
     }
 
